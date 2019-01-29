@@ -224,6 +224,7 @@ class Base(DRFMixin, ElasticSearchMixin, Configuration):
         "dockerflow.django",
         "parler",
         "rest_framework",
+        "storages",
     )
 
     # Group to add plugin to placeholder "Content"
@@ -524,12 +525,17 @@ class Production(Base):
 
     ALLOWED_HOSTS = values.ListValue(None)
 
-    # For static files in production, we want to use a backend that includes a hash in
-    # the filename, that is calculated from the file content, so that browsers always
-    # get the updated version of each file.
-    STATICFILES_STORAGE = (
-        "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
-    )
+    # For static files in production, we want to use an AWS S3 backend.
+    AWS_STORAGE_BUCKET_NAME = values.Value(None)
+    AWS_S3_REGION_NAME = values.Value(None)
+    AWS_ACCESS_KEY_ID = values.Value(None)
+    AWS_SECRET_ACCESS_KEY = values.Value(None)
+    AWS_S3_CUSTOM_DOMAIN = values.Value(None)
+
+    STATICFILES_LOCATION = 'static'
+    STATICFILES_STORAGE = 'custom_storages.StaticStorage'
+    MEDIAFILES_LOCATION = 'media'
+    DEFAULT_FILE_STORAGE = 'custom_storages.MediaStorage'
 
 
 class Feature(Production):
